@@ -1,6 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\LoginController;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Subject;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,6 +17,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
+Route::get('/', [LoginController::class, 'login'])->name('login');
+Route::post('/', [LoginController::class, 'postLogin']);
+Route::get('logout', [LoginController::class, 'logout'])->name('student.logout');
+Route::get('view-client', function(){
+    $subject = Subject::all();
+    return view('student.show', ['id' => Auth::id()] , compact('subject'));
+})->name('show-point-client');
