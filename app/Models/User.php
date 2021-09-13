@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\Information;
 
 class User extends Authenticatable
 {
@@ -17,10 +18,10 @@ class User extends Authenticatable
      *
      * @var string[]
      */
+    protected $table = 'users';
     protected $fillable = [
-        'name',
-        'email',
-        'password',
+      'id', 'username','password', 'id_class', 'role' , 'fullname', 'birth_date','address','hobby','gender',
+       'user_code' 
     ];
 
     /**
@@ -41,4 +42,17 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    //relationship
+    public function point(){
+        return $this->hasMany(Point::class, 'id_user');
+    }
+    public function subject(){
+        return $this->belongsToMany(Subject::class, 'point', 'id_user', 'id_subject');
+    }
+    public function classroom(){
+        return $this->hasOne(ClassRoom::class, 'id');
+    }
+      
+ 
 }

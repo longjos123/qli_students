@@ -13,7 +13,22 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app->bind(
+            'App\Repositories\Contracts\UserRepositoryInterface',
+            'App\Repositories\Eloquents\UserRepository'
+        );
+        $this->app->bind(
+            'App\Repositories\Contracts\SubjectRepositoryInterface',
+            'App\Repositories\Eloquents\SubjectRepository'
+        );
+        $this->app->bind(
+            'App\Repositories\Contracts\PointRepositoryInterface',
+            'App\Repositories\Eloquents\PointRepository'
+        );
+        $this->app->bind(
+            'App\Repositories\Contracts\ClassRepositoryInterface',
+            'App\Repositories\Eloquents\ClassRepository'
+        );
     }
 
     /**
@@ -23,6 +38,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        
     }
 }
