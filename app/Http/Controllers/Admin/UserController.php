@@ -4,16 +4,17 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\AddRequestForm;
-use App\Models\User;
-use App\Models\Subject;
-use App\Models\Point;
-use App\Models\ClassRoom;
+use Illuminate\Support\Facades\DB;
 use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Repositories\Contracts\SubjectRepositoryInterface;
 use App\Repositories\Contracts\PointRepositoryInterface;
 use App\Repositories\Contracts\ClassRepositoryInterface;
+use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use App\Constants\Constant;
+
+// use App\Constant\Const;
 
 class UserController extends Controller
 {
@@ -21,65 +22,93 @@ class UserController extends Controller
     protected $subjectRepository;
     protected $pointRepository;
     protected $classRepository;
-    public function __construct(UserRepositoryInterface $userRepository, 
-                                SubjectRepositoryInterface $subjectRepository,
-                                PointRepositoryInterface $pointRepository,
-                                ClassRepositoryInterface $classRepository)
-    {
+    public function __construct(
+        UserRepositoryInterface $userRepository,
+        SubjectRepositoryInterface $subjectRepository,
+        PointRepositoryInterface $pointRepository,
+        ClassRepositoryInterface $classRepository
+    ) {
         $this->userRepository = $userRepository;
         $this->subjectRepository = $subjectRepository;
         $this->pointRepository = $pointRepository;
         $this->classRepository = $classRepository;
     }
-    public function show(){
-        $students = $this->userRepository->get_all();
-        //lấy dữ liệu các môn học
-        $subject = $this->subjectRepository->get_all();
-        $students -> load('point', 'subject','classroom'); //load ra những cột của user trong bảng point và subject và clas
-        return view('admin.show', compact('students','subject'));
+    public function show()
+    {
         
+        $students = $this->userRepository->getAll();
+        //lấy dữ liệu các môn học
+        $subject = $this->subjectRepository->getAll();
+        $students->load('point', 'subject', 'classroom'); //load ra những cột của user trong bảng point và subject và clas
+
+        return view('admin.show', compact('students', 'subject'));
     }
-    public function detail($id){
+    public function detail($id)
+    {
+        $_ADMIN_ROLE = Constant::_ADMIN_ROLE;
+        $_GENDER_MALE = Constant::_ADMIN_ROLE;
         $student = $this->userRepository->find($id);
-        return view('admin.detail', compact('student'));
+
+        return view('admin.detail', compact('student','_ADMIN_ROLE','_GENDER_MALE'));
     }
-    public function editInfo($id){
+    public function editInfo($id)
+    {
         $student = $this->userRepository->find($id);
+
         return view('admin.editInfo', compact('student'));
     }
-    public function postEditinfo($id, Request $request){
+    public function postEditinfo($id, Request $request)
+    {
         $student = $this->userRepository->find($id);
-        $this->userRepository->editInfo($student,$request);
+        $this->userRepository->editInfo($student, $request);
+
         return redirect(route('student.detail', ['id' => $student->id]));;
     }
-    public function delete($id){
+    public function delete($id)
+    {
         $this->userRepository->delete($id);
+
         return redirect()->back();
-    }  
-    public function add(){
-        $classroom = $this->classRepository->get_all();
-        $subject = $this->subjectRepository->get_all();
-        return view('admin.add', compact('classroom', 'subject'));   
     }
-    public function postAdd(AddRequestForm $request){
-        $subject = $this->subjectRepository->get_all();
-        //thêm mới user
-        $id_new_user = $this->userRepository->add($request);
-        //thêm điểm vào bảng point cho new_user
-        $this->pointRepository->add_point($request, $id_new_user);
+    public function add()
+    {
+        $classroom = $this->classRepository->getAll();
+        $subject = $this->subjectRepository->getAll();
+
+        return view('admin.add', compact('classroom', 'subject'));
+    }
+    public function postAdd(AddRequestForm $request)
+    {
+        // $subject = $this->subjectRepository->getAll();
+        try {
+            DB::beginTransaction();
+            //thêm mới user
+            $idNewUser = $this->userRepository->add($request);
+            //thêm điểm vào bảng point cho new_user
+            $this->pointRepository->addPoint($request, $idNewUser);
+            DB::commit();
+        } catch (Exception $e) {
+            DB::rollBack();
+            throw new Exception($e->getMessage());
+        }
         return redirect(route('student.show'));
     }
-    public function editPoint($id){
-         $student_point = $this->pointRepository->find_point_user($id);
-        $subjects = $this->subjectRepository->get_all();
-         
-         return view('admin.edit_point', compact('student_point','subjects'));
+    public function editPoint($id)
+    {
+        $studentPoint = $this->pointRepository->findPointUser($id);
+        $subjects = $this->subjectRepository->getAll();
+
+        return view('admin.edit_point', compact('studentPoint', 'subjects'));
     }
-    public function postEditPoint($id, Request $request){
-        //Xóa dữ liệu điểm cũ
-        $student_point_edit = $this->pointRepository->delete_point_user($id);
+    public function postEditPoint($id, Request $request)
+    {
         //tạo 1 dữ liệu điểm mới cho user
-        $this->pointRepository->add_point_edit($id, $request);
+        try {
+            $this->pointRepository->addPointEdit($id, $request);
+        } catch (ModelNotFoundException $exception) {
+            return back()->withErrors($exception->getMessage())->withInput();
+        }
+
         return redirect(route('student.show'));
     }
 }

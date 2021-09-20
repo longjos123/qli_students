@@ -7,7 +7,7 @@ use App\Models\ClassRoom;
 
 class ClassRepository implements ClassRepositoryInterface
 {
-    public function get_all(){
+    public function getAll(){
         return ClassRoom::all();
     }
 }

@@ -18,7 +18,6 @@
     </thead>
     <tbody>
       @foreach ($students as $student)
-      {{-- <?php dd($student->toArray()) ?> --}}
         <tr>
             <th scope="row">{{$student->id}}</th>
             <td>{{$student->fullname}}</td>

@@ -7,7 +7,7 @@ use App\Models\Subject;
 
 class SubjectRepository implements SubjectRepositoryInterface
 {
-    public function get_all(){
+    public function getAll(){
         return Subject::all();
     }
 }
