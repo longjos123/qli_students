@@ -35,7 +35,7 @@ class UserController extends Controller
     }
     public function show()
     {
-        
+
         $students = $this->userRepository->getAll();
         //lấy dữ liệu các môn học
         $subject = $this->subjectRepository->getAll();
@@ -43,33 +43,57 @@ class UserController extends Controller
 
         return view('admin.show', compact('students', 'subject'));
     }
-    public function detail($id)
+
+    /**
+     * Hiển thị chi tiết học sinh
+     * @param int $id
+     */
+    public function detail(int $id)
     {
         $_ADMIN_ROLE = Constant::_ADMIN_ROLE;
         $_GENDER_MALE = Constant::_ADMIN_ROLE;
         $student = $this->userRepository->find($id);
 
-        return view('admin.detail', compact('student','_ADMIN_ROLE','_GENDER_MALE'));
+        return view('admin.detail', compact('student', '_ADMIN_ROLE', '_GENDER_MALE'));
     }
-    public function editInfo($id)
+
+    /**
+     * Sửa chi tiết học sinh
+     * @param int $id
+     */
+    public function editInfo(int $id)
     {
         $student = $this->userRepository->find($id);
 
         return view('admin.editInfo', compact('student'));
     }
-    public function postEditinfo($id, Request $request)
+
+    /**
+     * Lưu chi tiết học sinh
+     * @param int $id
+     * @param array $request
+     */
+    public function postEditinfo(int $id, Request $request)
     {
         $student = $this->userRepository->find($id);
         $this->userRepository->editInfo($student, $request);
 
         return redirect(route('student.detail', ['id' => $student->id]));;
     }
+
+    /**
+     * Xóa học sinh và điểm
+     * @param int $id
+     */
     public function delete($id)
     {
         $this->userRepository->delete($id);
 
         return redirect()->back();
     }
+    /**
+     * Thêm học sinh
+     */
     public function add()
     {
         $classroom = $this->classRepository->getAll();
@@ -77,6 +101,10 @@ class UserController extends Controller
 
         return view('admin.add', compact('classroom', 'subject'));
     }
+    /**
+     * Lưu học sinh
+     * @param array $request
+     */
     public function postAdd(AddRequestForm $request)
     {
         // $subject = $this->subjectRepository->getAll();
