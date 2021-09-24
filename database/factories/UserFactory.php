@@ -26,8 +26,9 @@ class UserFactory extends Factory
             'id' => random_int(4, 5),
             'username' => Str::random(10),
             'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
-            'fullname' => random_int(4, 5),
+            'fullname' => Str::random(10),
             'user_code' => random_int(4, 5),
+            'age' => random_int(4, 5),
             'address' => Str::random(30),
             'id_class' => random_int(1, 2),
             'hobby' => Str::random(30),

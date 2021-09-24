@@ -23,7 +23,7 @@ use App\Models\Subject;
 Route::get('/', [LoginController::class, 'login'])->name('login');
 Route::post('/', [LoginController::class, 'postLogin']);
 Route::get('logout', [LoginController::class, 'logout'])->name('student.logout');
-Route::get('view-client', function(){
+Route::get('view-client', function () {
     $subject = Subject::all();
-    return view('student.show', ['id' => Auth::id()] , compact('subject'));
-})->name('show-point-client');
+    return view('student.show', ['id' => Auth::id()], compact('subject'));
+})->middleware('auth')->name('show-point-client');

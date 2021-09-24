@@ -6,42 +6,70 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Requests\AddRequestForm;
 use Illuminate\Support\Facades\DB;
-use App\Repositories\Contracts\UserRepositoryInterface;
-use App\Repositories\Contracts\SubjectRepositoryInterface;
-use App\Repositories\Contracts\PointRepositoryInterface;
-use App\Repositories\Contracts\ClassRepositoryInterface;
+use App\Service\UserService;
+use App\Service\SubjectService;
+use App\Service\ClassService;
+use App\Service\PointService;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Constants\Constant;
 
-// use App\Constant\Const;
 
 class UserController extends Controller
 {
-    protected $userRepository;
-    protected $subjectRepository;
-    protected $pointRepository;
-    protected $classRepository;
+    protected $userService;
+    protected $subjectService;
+    protected $classService;
+
     public function __construct(
-        UserRepositoryInterface $userRepository,
-        SubjectRepositoryInterface $subjectRepository,
-        PointRepositoryInterface $pointRepository,
-        ClassRepositoryInterface $classRepository
-    ) {
-        $this->userRepository = $userRepository;
-        $this->subjectRepository = $subjectRepository;
-        $this->pointRepository = $pointRepository;
-        $this->classRepository = $classRepository;
+        UserService $userService,
+        SubjectService $subjectService,
+        ClassService $classService,
+        PointService $pointService
+    ){
+        $this->userService = $userService;
+        $this->subjectService = $subjectService;
+        $this->classService = $classService;
+        $this->pointService = $pointService;
     }
     public function show()
     {
 
-        $students = $this->userRepository->getAll();
+        $students = $this->userService->all();
         //lấy dữ liệu các môn học
-        $subject = $this->subjectRepository->getAll();
+        $subject = $this->subjectService->all();
         $students->load('point', 'subject', 'classroom'); //load ra những cột của user trong bảng point và subject và clas
 
         return view('admin.show', compact('students', 'subject'));
+    }
+
+    /**
+     * Thêm học sinh
+     * lấy thông tin lớp và môn để đưa ra view
+     */
+    public function view_add()
+    {
+        $classroom = $this->classService->all();
+        $subject = $this->subjectService->all();
+
+        return view('admin.add', compact('classroom', 'subject'));
+    }
+    /**
+     * Lưu học sinh
+     * @param array $request
+     */
+    public function postAdd(AddRequestForm $request)
+    {
+        DB::beginTransaction();
+        //thêm mới user
+        $idNewUser = $this->userService->addUser($request);
+        //thêm điểm vào bảng point cho new_user
+        $this->userService->addPoint($idNewUser, $request);
+        DB::commit();
+
+        DB::rollBack();
+
+        return redirect(route('student.show'));
     }
 
     /**
@@ -50,11 +78,9 @@ class UserController extends Controller
      */
     public function detail(int $id)
     {
-        $_ADMIN_ROLE = Constant::_ADMIN_ROLE;
-        $_GENDER_MALE = Constant::_ADMIN_ROLE;
-        $student = $this->userRepository->find($id);
+        $student = $this->userService->findUser($id);
 
-        return view('admin.detail', compact('student', '_ADMIN_ROLE', '_GENDER_MALE'));
+        return view('admin.detail', ['student' => $student, 'ADMIN_ROLE' => Constant::ADMIN_ROLE, 'GENDER_MALE' => Constant::GENDER_MALE]);
     }
 
     /**
@@ -87,44 +113,27 @@ class UserController extends Controller
      */
     public function delete($id)
     {
-        $this->userRepository->delete($id);
+        try {
+            // DB::beginTransaction();
+            $this->userService->findUser($id)->delete();
+            // $this->PointService->findPointStudent($id)->delete();
+            // DB::commit();
+        } catch (Exception $e) {
+            // DB::rollBack();
+            throw new Exception($e->getMessage());
+        }
 
         return redirect()->back();
     }
-    /**
-     * Thêm học sinh
-     */
-    public function add()
-    {
-        $classroom = $this->classRepository->getAll();
-        $subject = $this->subjectRepository->getAll();
 
-        return view('admin.add', compact('classroom', 'subject'));
-    }
     /**
-     * Lưu học sinh
-     * @param array $request
+     * Sửa điểm
+     * @param int $id
      */
-    public function postAdd(AddRequestForm $request)
+    public function editPoint(int $id)
     {
-        // $subject = $this->subjectRepository->getAll();
-        try {
-            DB::beginTransaction();
-            //thêm mới user
-            $idNewUser = $this->userRepository->add($request);
-            //thêm điểm vào bảng point cho new_user
-            $this->pointRepository->addPoint($request, $idNewUser);
-            DB::commit();
-        } catch (Exception $e) {
-            DB::rollBack();
-            throw new Exception($e->getMessage());
-        }
-        return redirect(route('student.show'));
-    }
-    public function editPoint($id)
-    {
-        $studentPoint = $this->pointRepository->findPointUser($id);
-        $subjects = $this->subjectRepository->getAll();
+        $studentPoint = $this->pointService->findPointStudent($id);
+        $subjects = $this->subjectService->all();
 
         return view('admin.edit_point', compact('studentPoint', 'subjects'));
     }
@@ -132,7 +141,7 @@ class UserController extends Controller
     {
         //tạo 1 dữ liệu điểm mới cho user
         try {
-            $this->pointRepository->addPointEdit($id, $request);
+            $this->pointService->addPointEdit($id, $request);
         } catch (ModelNotFoundException $exception) {
             return back()->withErrors($exception->getMessage())->withInput();
         }

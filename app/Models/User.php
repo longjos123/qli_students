@@ -20,7 +20,7 @@ class User extends Authenticatable
      */
     protected $table = 'users';
     protected $fillable = [
-      'id', 'username','password', 'id_class', 'role' , 'fullname', 'birth_date','address','hobby','gender','user_code' 
+        'id', 'username', 'password', 'id_class', 'role', 'fullname', 'birth_date', 'address', 'hobby', 'gender', 'user_code', 'age'
     ];
 
     /**
@@ -43,15 +43,16 @@ class User extends Authenticatable
     ];
 
     //relationship
-    public function point(){
+    public function point()
+    {
         return $this->hasMany(Point::class, 'id_user');
     }
-    public function subject(){
+    public function subject()
+    {
         return $this->belongsToMany(Subject::class, 'point', 'id_user', 'id_subject');
     }
-    public function classroom(){
+    public function classroom()
+    {
         return $this->hasOne(ClassRoom::class, 'id');
     }
-      
- 
 }

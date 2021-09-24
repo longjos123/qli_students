@@ -24,10 +24,10 @@ class LoginController extends Controller
     {
         $subject = $this->subjectRepository->getAll();
         // dd($request);
-        if (Auth::attempt(['username' => $request->username, 'password' => $request->password, 'role' => Constant::_ADMIN_ROLE])) {
+        if (Auth::attempt(['username' => $request->username, 'password' => $request->password, 'role' => Constant::ADMIN_ROLE])) {
             return redirect(route('student.show'));
         }
-        if (Auth::attempt(['username' => $request->username, 'password' => $request->password, 'role' => Constant::_CLIENT])) {
+        if (Auth::attempt(['username' => $request->username, 'password' => $request->password, 'role' => Constant::CLIENT])) {
             return view('student.show', compact('subject'));
         }
 
