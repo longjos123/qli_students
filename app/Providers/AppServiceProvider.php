@@ -13,23 +13,20 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind(
-            'App\Repositories\Contracts\UserRepositoryInterface',
-            'App\Repositories\Eloquents\UserRepository'
-        );
-        $this->app->bind(
-            'App\Repositories\Contracts\SubjectRepositoryInterface',
-            'App\Repositories\Eloquents\SubjectRepository'
-        );
-        $this->app->bind(
-            'App\Repositories\Contracts\PointRepositoryInterface',
-            'App\Repositories\Eloquents\PointRepository'
-        );
-        $this->app->bind(
-            'App\Repositories\Contracts\ClassRepositoryInterface',
-            'App\Repositories\Eloquents\ClassRepository'
-        );
     }
+    public $bindings = [
+        'App\Repositories\Contracts\UserRepositoryInterface'::class
+        => 'App\Repositories\Eloquents\UserRepository'::class,
+
+        'App\Repositories\Contracts\SubjectRepositoryInterface'::class
+        => 'App\Repositories\Eloquents\SubjectRepository'::class,
+
+        'App\Repositories\Contracts\PointRepositoryInterface'::class
+        => 'App\Repositories\Eloquents\PointRepository'::class,
+
+        'App\Repositories\Contracts\ClassRepositoryInterface'::class
+        => 'App\Repositories\Eloquents\ClassRepository'::class
+    ];
 
     /**
      * Bootstrap any application services.
@@ -38,6 +35,5 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        
     }
 }

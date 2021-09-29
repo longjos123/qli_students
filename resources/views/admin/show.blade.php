@@ -11,14 +11,13 @@
             <th scope="col" id="{{$item->name}}">{{$item->name}}</th>
         @endforeach
         <th scope="col">
-            <a href="{{route('student.add')}}" class="btn btn-primary" style="width: 110px;">Thêm</a>
+            <a href="{{route('student.view_add')}}" class="btn btn-primary" style="width: 110px;">Thêm</a>
             <a href="{{route('student.logout')}}" class="btn btn-danger">Đăng xuất</a>
         </th>
       </tr>
     </thead>
     <tbody>
       @foreach ($students as $student)
-      {{-- <?php dd($student->toArray()) ?> --}}
         <tr>
             <th scope="row">{{$student->id}}</th>
             <td>{{$student->fullname}}</td>

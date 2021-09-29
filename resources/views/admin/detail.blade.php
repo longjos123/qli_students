@@ -13,10 +13,10 @@
             <p>Địa chỉ: {{$student->address}}</p>
             <p>Giới tính: 
                 <?php
-                $gender = $student->gender === 1 ? 'Nam' :'Nữ';?>  
+                $gender = $student->gender === $GENDER_MALE ? 'Nam' :'Nữ';?>  
                 {{$gender}}
             </p>
-            @if(Auth::user()->role == 1)
+            @if(Auth::user()->role == $ADMIN_ROLE)
                 <a href="{{route('editInfo',['id' => $student->id])}}" class="btn btn-primary">Sửa thông tin</a>
                 <a href="{{route('student.show')}}" class="btn btn-secondary">Bảng điểm</a>   
             @else

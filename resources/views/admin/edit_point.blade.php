@@ -3,7 +3,7 @@
 
     <form action="" method="post">
         @csrf
-        @foreach ($student_point as $item)
+        @foreach ($studentPoint as $item)
                 @foreach ($subjects as $subject)
                     @if ($item->id_subject === $subject->id)
                         <div class="col-2">

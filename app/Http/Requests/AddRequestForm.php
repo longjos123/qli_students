@@ -30,14 +30,15 @@ class AddRequestForm extends FormRequest
             'fullname' => 'required',
             'role' => 'required',
             'gender' => 'required',
-            'birth_date' =>'required',
+            'birth_date' =>'required|date_format:dd/mm/yyyy',
             'age' => 'required|min:1|numeric',
             'address' => 'required',
             'hobby' => 'required',
-            'id_class' => 'required'
+            'id_class' => 'required',
         ];
     }
-    public function massages(){
+    public function massages()
+    {
         return [
             'username.required' => 'Chưa nhập Username!!!',
             'username.unique' => 'Username đã tôn tại!',
@@ -46,11 +47,14 @@ class AddRequestForm extends FormRequest
             'role.required' => 'Chưa chọn vai trò!',
             'gender.required' => 'Chưa chọn giới tính!',
             'birth_date.required' => 'Chưa nhập ngày sinh!',
+            'birth_date.date_format' => 'Ngày sinh không đúng định dạng!',
             'age.required' => 'Chưa nhập tuổi!',
+            'age.min' => 'Nhập sai định dạng tuổi!',
             'age.numeric' => 'Tuổi phải nhập số!',
             'address.required' => 'Chưa nhập địa chỉ!',
             'hobby.required' => 'Chưa nhập sở thích!',
             'id_class.required' => 'Chưa chọn lớp!',
+
         ];
     }
 }

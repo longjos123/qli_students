@@ -7,7 +7,6 @@
     <title>Login</title>
 </head>
 <body>
-    
     <div class="container">
         <h1>Đăng nhập</h1>
         <hr>
