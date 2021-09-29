@@ -13,4 +13,5 @@ Route::prefix('students')->group(function () {
     Route::post('editPoint/{id}', [UserController::class, 'postEditPoint']);
     Route::get('add', [UserController::class, 'view_add'])->middleware('auth')->name('student.view_add');
     Route::post('add', [UserController::class, 'postAdd'])->middleware('auth')->name('student.postadd');
+    // Route::resource('users', UserController::class);
 });

@@ -26,10 +26,7 @@ class PointRepository implements PointRepositoryInterface
 
     public function findPoint($id)
     {
-        return $this->point->find('id_user', '=', $id)
-            ->join('users', 'point.id_user', '=', 'users.id')
-            ->join('subjects', 'point.id_subject', '=', 'subjects.id')
-            ->get();
+        return $this->point->find('id_user', '=', $id)->get();
     }
 
     public function deletePoint($id)

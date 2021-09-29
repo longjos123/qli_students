@@ -26,7 +26,7 @@ class UserController extends Controller
         SubjectService $subjectService,
         ClassService $classService,
         PointService $pointService
-    ){
+    ) {
         $this->userService = $userService;
         $this->subjectService = $subjectService;
         $this->classService = $classService;
@@ -114,12 +114,8 @@ class UserController extends Controller
     public function delete($id)
     {
         try {
-            // DB::beginTransaction();
             $this->userService->findUser($id)->delete();
-            // $this->PointService->findPointStudent($id)->delete();
-            // DB::commit();
         } catch (Exception $e) {
-            // DB::rollBack();
             throw new Exception($e->getMessage());
         }
 
@@ -133,6 +129,7 @@ class UserController extends Controller
     public function editPoint(int $id)
     {
         $studentPoint = $this->pointService->findPointStudent($id);
+        $studentPoint->load('user', 'point_sub');
         $subjects = $this->subjectService->all();
 
         return view('admin.edit_point', compact('studentPoint', 'subjects'));
